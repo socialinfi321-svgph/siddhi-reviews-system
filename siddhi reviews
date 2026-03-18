@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100dvh; /* Mobile screen ke andar sab lock karne ke liye */
+      width: 100%;
+      overflow: hidden; /* Main page par koi scroll nahi hoga */
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: url('https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
+      transition: filter 0.3s;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.7) 100%);
+      z-index: 0;
+    }
+
+    body.dark-mode::before {
+      background: linear-gradient(135deg, rgba(15,15,15,0.95) 0%, rgba(30,30,30,0.85) 100%);
+    }
+
+    /* --- FIXED HEADER CSS --- */
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 5%;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+      position: relative;
+      z-index: 100;
+      width: 100%;
+      flex: 0 0 auto; /* Header ko compress hone se rokega */
+    }
+    
+    body.dark-mode .top-header {
+      background: rgba(20, 20, 20, 0.9);
+      box-shadow: 0 2px 15px rgba(0,0,0,0.5);
+    }
+
+    .logo-area { display: flex; align-items: center; gap: 10px; margin-left: 45px; /* Hamburger menu ke liye space */ }
+    .logo-icon { font-size: 28px; color: #2b7a2b; }
+    .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .logo-siddhi { font-size: 20px; font-weight: 800; color: #004b87; text-transform: lowercase; }
+    .logo-physio { font-size: 11px; font-weight: 800; color: #e31b6d; text-transform: uppercase; letter-spacing: 1px; }
+    
+    body.dark-mode .logo-siddhi { color: #5aa7ff; }
+    body.dark-mode .logo-physio { color: #ff6b9e; }
+
+    /* --- MENU BUTTON --- */
+    .menu-btn {
+      position: absolute; 
+      top: 13px; /* Header ke center me align karne ke liye */
+      left: 15px; 
+      width: 38px; 
+      height: 38px;
+      background: rgba(255, 255, 255, 0.6); 
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(0, 75, 135, 0.1);
+      border-radius: 8px; 
+      z-index: 1001; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      gap: 5px; 
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .menu-btn span { width: 20px; height: 3px; background: #004b87; border-radius: 2px; }
+    body.dark-mode .menu-btn { background: rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.1); }
+    body.dark-mode .menu-btn span { background: #fff; }
+
+    /* --- MAIN CONTENT LAYOUT --- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+      z-index: 10;
+      padding: 0 5%;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* --- EXACT 40px GAP FROM HEADER --- */
+    .hero-content {
+      margin-top: 40px; /* Header ke theek 40px niche */
+      margin-bottom: 20px;
+      animation: fadeInDown 0.8s ease;
+      width: 100%;
+    }
+
+    .hero-content h1 {
+      font-size: 24px;
+      color: #004b87;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+    }
+    body.dark-mode .hero-content h1 { color: #ffffff; }
+
+    .hero-content h1 span {
+      font-size: 15px;
+      font-weight: 600;
+      color: #e31b6d;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 2px;
+    }
+    body.dark-mode .hero-content h1 span { color: #ff6b9e; }
+
+    .hero-location { font-size: 11px; font-weight: 700; color: #666; letter-spacing: 2px; }
+    body.dark-mode .hero-location { color: #ccc; }
+
+    /* --- REVIEW SECTION WRAPPER --- */
+    .review-wrapper {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeInUp 0.8s ease;
+      flex: 1; 
+    }
+
+    .subtitle { font-size: 13px; color: #333; margin-bottom: 12px; font-weight: 600; }
+    body.dark-mode .subtitle { color: #ddd; }
+
+    /* --- GLASSMORPHISM BOX --- */
+    .glass-box {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 10px 30px 0 rgba(0, 75, 135, 0.12);
+      border-radius: 20px;
+      padding: 16px 16px 50px 16px; 
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #002d52;
+      line-height: 1.5;
+      text-align: left;
+      position: relative;
+      max-height: 160px; 
+      overflow-y: auto; 
+      margin-bottom: 25px; 
+    }
+
+    body.dark-mode .glass-box {
+      background: rgba(30, 30, 30, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.6);
+    }
+
+    .glass-box::-webkit-scrollbar { width: 4px; }
+    .glass-box::-webkit-scrollbar-track { background: transparent; }
+    .glass-box::-webkit-scrollbar-thumb { background: rgba(227, 27, 109, 0.4); border-radius: 10px; }
+
+    .text-limit { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+    .expand-dots {
+      font-weight: 800; color: #e31b6d; cursor: pointer;
+      margin-top: 5px; display: inline-block; font-size: 13px;
+    }
+
+    .copy-btn {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, #e31b6d, #c2155c); color: white;
+      border: none; padding: 8px 24px; border-radius: 25px; cursor: pointer;
+      font-weight: 700; font-size: 13px; transition: 0.3s;
+      box-shadow: 0 4px 15px rgba(227, 27, 109, 0.3); width: max-content;
+    }
+    .copy-btn:hover { transform: translateX(-50%) scale(1.05); }
+
+    /* --- GOOGLE REVIEW BUTTON (4 COLORS ANIMATION) --- */
+    .google-btn {
+      display: inline-block;
+      border-radius: 30px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 12px 35px;
+      /* Google's Blue, Red, Yellow, Green */
+      background: linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853, #4285F4);
+      background-size: 400% 400%;
+      animation: googleColors 4s ease infinite;
+      box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+      cursor: pointer;
+      transition: 0.3s;
+      
+      /* EXACTLY 40px MORE GAP ADDED HERE (25px pehle tha, ab 65px hai) */
+      margin-bottom: 65px; 
+      
+      width: 100%;
+      max-width: 260px;
+      letter-spacing: 0.5px;
+    }
+    
+    .google-btn.disabled { cursor: not-allowed; opacity: 0.65; filter: grayscale(50%); box-shadow: none; animation: none; background: #999; }
+    
+    /* Smooth Google color transition Keyframes */
+    @keyframes googleColors { 
+      0% { background-position: 0% 50%; } 
+      50% { background-position: 100% 50%; } 
+      100% { background-position: 0% 50%; } 
+    }
+
+    /* --- BOTTOM TEXT ALIGNMENT --- */
+    .star-section { color: #004b87; line-height: 1.2; margin-bottom: 5px; }
+    body.dark-mode .star-section { color: #fff; }
+    
+    .star-section .top-text { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .stars { font-size: 24px; letter-spacing: 3px; margin: 2px 0; }
+    .star-section .bottom-text { font-size: 10px; font-weight: 600; opacity: 0.8; }
+
+    .thanks { margin-top: 5px; font-size: 20px; font-family: 'Brush Script MT', cursive, sans-serif; color: #e31b6d; font-weight: 700; }
+    body.dark-mode .thanks { color: #ff6b9e; }
+
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- INSTRUCTION BOT & DEEP BLUE INFO BOX --- */
+    .instruction-btn {
+      position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px;
+      background: rgba(255,255,255,0.9); backdrop-filter: blur(5px);
+      border: 2px solid #e31b6d; border-radius: 50%;
+      cursor: pointer; display: flex; justify-content: center; align-items: center;
+      z-index: 1001; box-shadow: 0 4px 15px rgba(227, 27, 109, 0.3);
+    }
+    .instruction-btn::before { content: '🤖'; font-size: 22px; }
+
+    .quick-info-box {
+      position: fixed; bottom: 75px; right: 20px; width: max-content; max-width: 210px;
+      background: rgba(10, 30, 70, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(100, 180, 255, 0.3); border-radius: 12px; padding: 14px;
+      z-index: 1000; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transform: translateY(10px); opacity: 0; pointer-events: none; transition: 0.4s ease;
+    }
+    .quick-info-box.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .quick-info-box::after {
+      content: ''; position: absolute; bottom: -8px; right: 15px;
+      border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid rgba(10, 30, 70, 0.75);
+    }
+    .info-step { color: #e0f0ff; font-size: 11px; font-weight: 500; margin-bottom: 5px; letter-spacing: 0.3px; }
+    .info-step:last-child { margin-bottom: 0; }
+    .info-step strong { color: #4fc3f7; }
+
+    /* --- SIDE MENU --- */
+    .side-menu {
+      position: fixed; top: 0; left: -100%; width: 280px; height: 100%;
+      background: white; z-index: 1000; box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+      transition: left 0.3s ease; padding: 80px 20px 20px; overflow-y: auto;
+    }
+    body.dark-mode .side-menu { background: #1a1a1a; color: white; }
+    .side-menu.open { left: 0; }
+    .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+    .menu-overlay.show { display: block; }
+    
+    .mode-toggle { margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px; }
+    .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 22px; transition: 0.4s; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.4s; }
+    input:checked + .slider { background-color: #004b87; }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    /* --- POPUPS --- */
+    .instruction-popup, .popup-overlay, .star-animation-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center;
+    }
+    .instruction-popup.show, .popup-overlay.show, .star-animation-overlay.show { display: flex; }
+    .instruction-box, .popup-box { background: white; border-radius: 20px; padding: 25px 20px; max-width: 300px; width: 85%; text-align: center; }
+    body.dark-mode .instruction-box, body.dark-mode .popup-box { background: #222; color: white; }
+    .star-animation-overlay { background: linear-gradient(135deg, #004b87, #e31b6d); flex-direction: column; }
+    .animation-text { font-size: 20px; color: white; font-weight: 800; margin-bottom: 20px; }
+    .animated-stars { display: flex; gap: 10px; font-size: 40px; }
+    .animated-star { opacity: 0.3; transition: all 0.5s ease; filter: grayscale(100%); }
+    .animated-star.light { opacity: 1; filter: grayscale(0%); transform: scale(1.2); }
+  </style>
+</head>
+<body>
+
+  <header class="top-header">
+    <div class="logo-area">
+      <div class="logo-icon">⚕️</div>
+      <div class="logo-text">
+        <span class="logo-siddhi">siddhi</span>
+        <span class="logo-physio">PHYSIOTHERAPY</span>
+      </div>
+    </div>
+  </header>
+
+  <button class="menu-btn" id="menuBtn">
+    <span></span><span></span><span></span>
+  </button>
+
+  <button class="instruction-btn" id="instructionBtn"></button>
+  <div class="quick-info-box" id="quickInfoBox">
+    <div class="info-step">Step 1: <strong>Click copy text</strong></div>
+    <div class="info-step">Step 2: <strong>Click google review</strong></div>
+    <div class="info-step">Step 3: <strong>Give 5 star</strong></div>
+    <div class="info-step">Step 4: <strong>Paste the review</strong></div>
+  </div>
+
+  <div class="menu-overlay" id="menuOverlay"></div>
+
+  <div class="side-menu" id="sideMenu">
+    <div class="menu-content">
+      <h3 style="color:#004b87; font-weight:700; margin-bottom: 10px;">Policy & Info</h3>
+      <p style="font-size: 12px; color: #666; line-height: 1.5;">All reviews are voluntary and for feedback purposes only. By using this page, you agree that reviews reflect personal experience only.</p>
+      <div class="mode-toggle">
+        <h4 style="font-size: 14px; margin-bottom:12px; color: #333;">Theme</h4>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <span style="font-size:12px; color: #555;">Light</span>
+          <label class="switch"><input type="checkbox" id="darkModeToggle"><span class="slider"></span></label>
+          <span style="font-size:12px; color: #555;">Dark</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    
+    <div class="hero-content">
+      <h1><span>Welcome to</span>Siddhi Physiotherapy</h1>
+      <p class="hero-location">NAWADA | BIHAR</p>
+    </div>
+
+    <div class="review-wrapper">
+      <div class="subtitle">Copy the text below 👇</div>
+      
+      <div class="glass-box" id="reviewBox">
+        <p id="reviewText" class="text-limit">Loading review...</p>
+        <span id="expandDots" class="expand-dots">Read more</span>
+        <button class="copy-btn" id="copyBtn">Copy Text</button>
+      </div>
+
+      <a id="googleBtn" class="google-btn disabled">Google Reviews</a>
+
+      <div class="star-section">
+        <span class="top-text">Only give</span>
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <span class="bottom-text">May your day not be good but great</span>
+      </div>
+
+      <div class="thanks">Thanks for supporting</div>
+    </div>
+
+  </main>
+
+  <div class="instruction-popup" id="instructionPopup">
+    <div class="instruction-box">
+      <h3 style="color:#e31b6d; margin-bottom:15px; font-weight:700;">Instructions</h3>
+      <p style="font-size:13px; margin-bottom:10px; font-weight:500;">1. Copy text from the box</p>
+      <p style="font-size:13px; margin-bottom:10px; font-weight:500;">2. Click 'Google Reviews'</p>
+      <p style="font-size:13px; margin-bottom:15px; font-weight:500;">3. Give 5 ⭐ and Paste</p>
+      <button class="copy-btn" id="closeInstruction" style="position:relative; transform:none; left:0; width:100%;">Got it!</button>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup-box">
+      <h4 style="color:#333; font-size: 14px;">पहले Copy Text बटन पर क्लिक करें</h4>
+    </div>
+  </div>
+
+  <div class="star-animation-overlay" id="starAnimationOverlay">
+    <div class="animation-text">Give 5 Stars and Paste</div>
+    <div class="animated-stars">
+      <span class="animated-star">⭐</span><span class="animated-star">⭐</span><span class="animated-star">⭐</span><span class="animated-star">⭐</span><span class="animated-star">⭐</span>
+    </div>
+  </div>
+
+  <script>
+    const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbxSvvGRmkwFeMCMr5wQQEf6KPRSM-FlK4Xp24alHkgFFMyT_Ue4aWzE5Ee8bYAfQUo0/exec';
+
+    const reviewText = document.getElementById('reviewText');
+    const expandDots = document.getElementById('expandDots');
+    const copyBtn = document.getElementById('copyBtn');
+    const googleBtn = document.getElementById('googleBtn');
+    const popupOverlay = document.getElementById('popupOverlay');
+    const menuBtn = document.getElementById('menuBtn');
+    const sideMenu = document.getElementById('sideMenu');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const instructionBtn = document.getElementById('instructionBtn');
+    const instructionPopup = document.getElementById('instructionPopup');
+    const closeInstruction = document.getElementById('closeInstruction');
+    const starAnimationOverlay = document.getElementById('starAnimationOverlay');
+    const quickInfoBox = document.getElementById('quickInfoBox');
+
+    let currentReviewId = null;
+    let copyClicked = false;
+    let reviewReserved = false;
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        quickInfoBox.classList.add('show');
+        setTimeout(() => quickInfoBox.classList.remove('show'), 120000); 
+      }, 500);
+    });
+
+    instructionBtn.addEventListener('click', () => quickInfoBox.classList.toggle('show'));
+    closeInstruction.addEventListener('click', () => instructionPopup.classList.remove('show'));
+    instructionPopup.addEventListener('click', (e) => { if(e.target === instructionPopup) instructionPopup.classList.remove('show'); });
+
+    menuBtn.addEventListener('click', () => {
+      sideMenu.classList.toggle('open');
+      menuOverlay.classList.toggle('show');
+    });
+
+    menuOverlay.addEventListener('click', () => {
+      sideMenu.classList.remove('open');
+      menuOverlay.classList.remove('show');
+    });
+
+    darkModeToggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark-mode', darkModeToggle.checked);
+      localStorage.setItem('darkMode', darkModeToggle.checked ? 'enabled' : 'disabled');
+    });
+
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      document.body.classList.add('dark-mode');
+      darkModeToggle.checked = true;
+    }
+
+    let expanded = false;
+    expandDots.addEventListener("click", () => {
+      expanded = !expanded;
+      if (expanded) {
+        reviewText.classList.remove("text-limit");
+        expandDots.textContent = "Show less";
+      } else {
+        reviewText.classList.add("text-limit");
+        expandDots.textContent = "Read more";
+      }
+    });
+
+    function showPopup() {
+      popupOverlay.classList.add('show');
+      setTimeout(() => popupOverlay.classList.remove('show'), 2000);
+    }
+
+    function showStarAnimation() {
+      starAnimationOverlay.classList.add('show');
+      const stars = document.querySelectorAll('.animated-star');
+      stars.forEach((star, index) => setTimeout(() => star.classList.add('light'), index * 400));
+      setTimeout(() => {
+        starAnimationOverlay.classList.remove('show');
+        stars.forEach(star => star.classList.remove('light'));
+        window.open('https://search.google.com/local/writereview?placeid=ChIJ70sUJVH_8jkR79xIDG72H_Q', '_blank');
+      }, 3000);
+    }
+
+    async function fetchReview() {
+      try {
+        const response = await fetch(SHEET_API_URL + '?action=reserve');
+        const textData = await response.text();
+        let data;
+        try { data = JSON.parse(textData); }
+        catch {
+          reviewText.innerText = textData.trim();
+          setupCopyButton(textData.trim());
+          return;
+        }
+        if (data.review) {
+          currentReviewId = data.id;
+          reviewReserved = true;
+          reviewText.innerText = data.review;
+          setupCopyButton(data.review);
+          setTimeout(() => { if (!copyClicked && reviewReserved) releaseReview(); }, 60000);
+        }
+      } catch { reviewText.innerText = "Error fetching review."; }
+    }
+
+    async function releaseReview() {
+      if (!currentReviewId || !reviewReserved) return;
+      await fetch(`${SHEET_API_URL}?action=release&id=${currentReviewId}`);
+      reviewReserved = false;
+    }
+
+    function setupCopyButton(textToCopy) {
+      const newBtn = copyBtn.cloneNode(true);
+      copyBtn.parentNode.replaceChild(newBtn, copyBtn);
+      newBtn.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(textToCopy);
+        newBtn.innerText = "Copied ✓";
+        copyClicked = true;
+        googleBtn.classList.remove('disabled');
+        setTimeout(() => newBtn.innerText = "Copy Text", 2000);
+      });
+    }
+
+    googleBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!copyClicked) return showPopup();
+      if (copyClicked && currentReviewId && reviewReserved) {
+        await fetch(`${SHEET_API_URL}?action=confirmUsed&id=${currentReviewId}`);
+        reviewReserved = false;
+      }
+      showStarAnimation();
+    });
+
+    window.addEventListener('beforeunload', () => {
+      if (!copyClicked && reviewReserved) navigator.sendBeacon(`${SHEET_API_URL}?action=release&id=${currentReviewId}`);
+    });
+
+    fetchReview();
+  </script>
+</body>
+</html>
